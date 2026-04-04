@@ -1,0 +1,43 @@
+data:
+  raw_dir: "data/raw"
+  frames_dir: "data/frames"
+  windows_dir: "data/windows"
+  manifest_path: "data/manifest.csv"
+  target_fps: 10
+  resize:
+    width: 640
+    height: 360
+  classes:
+    - normal
+    - anomaly
+  class_to_idx:
+    normal: 0
+    anomaly: 1
+
+shanghaitech:
+  dataset_dir: "data/raw/shanghaitech"
+  training_videos: "data/raw/shanghaitech/training/videos"
+  testing_videos: "data/raw/shanghaitech/testing/videos"
+  testing_masks: "data/raw/shanghaitech/testing/test_frame_mask"
+
+sliding_window:
+  window_size: 16
+  stride: 8
+  feature_height: 64
+  feature_width: 64
+
+training:
+  window_size: 16
+  batch_size: 16
+  epochs: 50
+  lr: 0.0003
+  weight_decay: 0.0001
+  patience: 10
+  val_split: 0.2
+  test_split: 0.1
+  architecture: "convlstm"
+  feature_channels: 2
+  hidden_dim: 64
+  num_classes: 2
+  checkpoint_dir: "checkpoints/"
+  drive_checkpoint_path: "/content/drive/MyDrive/v32/best_model.pth"

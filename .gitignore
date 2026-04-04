@@ -1,0 +1,42 @@
+# Environment
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.DS_Store
+
+# Conda
+*.egg-info/
+dist/
+build/
+
+# Data
+data/raw/
+data/frames/
+data/windows/
+
+# Checkpoints
+checkpoints/*.pth
+checkpoints/*.pt
+
+# Outputs
+outputs/
+results/
+
+# Notebooks
+notebooks/.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# Logs
+*.log
+*.csv
+
+# Misc
+*.tar.gz
+*.zip
+*.npy
+
+
+# Exceptions
+!results/*.png
+!results/*.jpg
