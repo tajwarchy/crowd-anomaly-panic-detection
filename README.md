@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-MPS-orange)
-![AUC](https://img.shields.io/badge/AUC--ROC-0.9648-green)
+
 
 A dual-stream crowd anomaly detection system combining appearance density maps
 and optical flow motion signals, with a ConvLSTM temporal classifier and an
