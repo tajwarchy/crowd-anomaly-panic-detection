@@ -77,3 +77,11 @@ flow:
 output:
   video_dir: "outputs/videos"
   results_dir: "results"
+
+alert:
+  threshold: 0.6
+  cooldown_seconds: 5.0
+  clip_pre_seconds: 3.0
+  clip_post_seconds: 3.0
+  log_path: "results/alerts.csv"
+  clips_dir: "outputs/clips"
