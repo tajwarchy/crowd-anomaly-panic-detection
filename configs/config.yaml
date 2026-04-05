@@ -2,7 +2,7 @@ data:
   raw_dir: "data/raw"
   frames_dir: "data/frames"
   windows_dir: "data/windows"
-  manifest_path: "data/manifest.csv"
+  manifest_path: "data/windows/windows_manifest.csv"
   target_fps: 10
   resize:
     width: 640
@@ -23,8 +23,8 @@ shanghaitech:
 sliding_window:
   window_size: 16
   stride: 8
-  feature_height: 64
-  feature_width: 64
+  feature_height: 32
+  feature_width: 32
 
 training:
   window_size: 16
@@ -73,3 +73,7 @@ flow:
   entropy_grid:
     rows: 4
     cols: 4
+
+output:
+  video_dir: "outputs/videos"
+  results_dir: "results"
