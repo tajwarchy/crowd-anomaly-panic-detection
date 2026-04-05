@@ -60,46 +60,58 @@ def extract_frames(cfg):
                 "num_frames": saved,
             })
 
-    # --- Testing videos (normal + anomaly, frame-level masks) ---
-    test_video_dir = Path(st_cfg["testing_videos"])
+    # --- Testing (pre-extracted frames in subfolders) ---
+    test_frames_dir = Path(st_cfg["testing_videos"])
     test_mask_dir = Path(st_cfg["testing_masks"])
-    test_videos = sorted(list(test_video_dir.glob("*.avi")) +
-                         list(test_video_dir.glob("*.mp4")))
 
-    for video_path in tqdm(test_videos, desc="Testing"):
-        clip_name = video_path.stem
+    clip_dirs = sorted([d for d in test_frames_dir.iterdir() if d.is_dir()])
+
+    for clip_dir in tqdm(clip_dirs, desc="Testing"):
+        clip_name = clip_dir.name
         out_dir = frames_dir / "testing" / clip_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # Load frame-level mask if exists
-        mask_path = test_mask_dir / f"{clip_name}.npy"
-        frame_labels = None
-        if mask_path.exists():
-            frame_labels = np.load(str(mask_path))  # binary per-frame
-
-        cap = cv2.VideoCapture(str(video_path))
-        src_fps = cap.get(cv2.CAP_PROP_FPS) or 24.0
+        # Collect and downsample frames
+        all_frames = sorted(clip_dir.glob("*.jpg")) + sorted(clip_dir.glob("*.png"))
+        src_fps = 24.0  # ShanghaiTech default
         frame_interval = max(1, round(src_fps / target_fps))
+        selected = [f for i, f in enumerate(all_frames) if i % frame_interval == 0]
 
-        frame_idx, saved = 0, 0
         saved_labels = []
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            if frame_idx % frame_interval == 0:
-                cv2.imwrite(str(out_dir / f"{saved:06d}.jpg"),
-                            cv2.resize(frame, (W, H)))
-                if frame_labels is not None and frame_idx < len(frame_labels):
-                    saved_labels.append(int(frame_labels[frame_idx]))
-                else:
-                    saved_labels.append(0)
-                saved += 1
-            frame_idx += 1
-        cap.release()
+        mask_path = test_mask_dir / f"{clip_name}.npy"
+        frame_labels = np.load(str(mask_path)) if mask_path.exists() else None
 
-        if saved < win_size:
+        for saved, src_path in enumerate(selected):
+            frame = cv2.imread(str(src_path))
+            if frame is None:
+                continue
+            cv2.imwrite(str(out_dir / f"{saved:06d}.jpg"),
+                        cv2.resize(frame, (W, H)))
+            orig_idx = saved * frame_interval
+            if frame_labels is not None and orig_idx < len(frame_labels):
+                saved_labels.append(int(frame_labels[orig_idx]))
+            else:
+                saved_labels.append(0)
+
+        if len(selected) < win_size:
             continue
+
+        labels_arr = np.array(saved_labels, dtype=np.int32)
+        labels_out = out_dir / "frame_labels.npy"
+        np.save(str(labels_out), labels_arr)
+
+        has_anomaly = int(labels_arr.max())
+        label_str = "anomaly" if has_anomaly else "normal"
+
+        records.append({
+            "clip_name": clip_name,
+            "split": "test",
+            "label": label_str,
+            "label_idx": class_to_idx[label_str],
+            "frames_dir": str(out_dir),
+            "mask_path": str(labels_out),
+            "num_frames": len(selected),
+        })
 
         # Save per-frame label array for this clip
         labels_arr = np.array(saved_labels, dtype=np.int32)

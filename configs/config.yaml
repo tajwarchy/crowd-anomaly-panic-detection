@@ -17,7 +17,7 @@ data:
 shanghaitech:
   dataset_dir: "data/raw/shanghaitech"
   training_videos: "data/raw/shanghaitech/training/videos"
-  testing_videos: "data/raw/shanghaitech/testing/videos"
+  testing_videos: "data/raw/shanghaitech/testing/frames"
   testing_masks: "data/raw/shanghaitech/testing/test_frame_mask"
 
 sliding_window:
@@ -41,3 +41,35 @@ training:
   num_classes: 2
   checkpoint_dir: "checkpoints/"
   drive_checkpoint_path: "/content/drive/MyDrive/v32/best_model.pth"
+
+density:
+  csrnet_weights: "checkpoints/csrnet_v31.pth"
+  input_size: 640
+  output_scale: 8
+
+inference:
+  checkpoint_path: "checkpoints/best_model.pth"
+  device_density: "mps"
+  device_flow: "cpu"
+  device_classifier: "cpu"
+  frame_skip: 4
+  window_stride: 4
+  output_width: 640
+  timeline_height: 80
+
+flow:
+  method: "farneback"
+  farneback:
+    pyr_scale: 0.5
+    levels: 3
+    winsize: 15
+    iterations: 3
+    poly_n: 5
+    poly_sigma: 1.2
+    flags: 0
+  raft:
+    model_path: "checkpoints/raft-things.pth"
+    small: true
+  entropy_grid:
+    rows: 4
+    cols: 4
